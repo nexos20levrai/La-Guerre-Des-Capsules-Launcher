@@ -1,0 +1,30 @@
+{
+  "name": "launcher-la-guerre-des-capsules",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "La Guerre Des Capsules Launcher",
+    "productName": "La Guerre Des Capsules Launcher",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "NeXoS_20",
+  "license": "ISC",
+  "description": "Launcher du jeu La Guerre Des Capsules",
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "os": "^0.1.2",
+    "unzipper": "^0.12.3"
+  }
+}

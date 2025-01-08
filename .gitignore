@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dossiers temporaires
+tmp/
+temp/
+
+# Fichiers de configuration
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignorer les fichiers de build
+dist/
+build/
+
+# Ignorer les fichiers de cache
+.cache/
+
+# Ignorer les fichiers de l'IDE
+.vscode/
+.idea/
+
+# Ignorer les fichiers de l'OS
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers spécifiques
+*.iit
