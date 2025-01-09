@@ -16,6 +16,7 @@ temp/
 .env.development.local
 .env.test.local
 .env.production.local
+package-lock.json
 
 # Ignorer les fichiers de build
 dist/

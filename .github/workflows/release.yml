@@ -12,7 +12,7 @@ jobs:
 
       - name: Get version
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
-      
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -21,7 +21,7 @@ jobs:
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
-          draft: true
+          draft: true  # Crée la release en mode brouillon
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
 
   build-launcher:
@@ -42,6 +42,10 @@ jobs:
         with:
           python-version: 3.x
 
+      - name: Install Updates
+        run: npm i
+        shell: bash
+
       - name: Install Dependencies
         run: npm ci
         shell: bash
@@ -51,11 +55,29 @@ jobs:
           GH_TOKEN: ${{ secrets.github_token }}
         run: npm run build
         shell: bash
-        
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
           files: La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe.blockmap latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
+  update-release:
+    needs: build-launcher
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Release to Official
+        run: |
+          # Récupérer l'ID de la release en mode draft (créée précédemment)
+          release_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.version }}" \
+            | jq .id)
+
+          # Mettre à jour la release pour la rendre officielle (pas draft)
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"draft": false}' \
+            "https://api.github.com/repos/${{ github.repository }}/releases/$release_id"
+        env:
+          version: ${{ env.version }}
