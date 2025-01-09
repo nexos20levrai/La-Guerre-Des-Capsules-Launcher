@@ -1,4 +1,4 @@
-name: Build, Sign and Release with Cosign
+name: Build, Sign, and Release
 
 on:
   push:
@@ -20,13 +20,13 @@ jobs:
       - name: Create Release (Draft)
         id: create_release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Utilisation de GH_TOKEN comme secret
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
           draft: true
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build-and-sign:
     needs: create-release
@@ -65,6 +65,20 @@ jobs:
 
       - name: Sign the .exe with Cosign
         run: |
-          cosign sign --key cosign.key ./path-to-your-build-file.exe
+          cosign sign --key cosign.key ./dist/La-Guerre-Des-Capsules-Launcher-Setup-0.0.1.exe
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+  publish-release:
+    needs: build-and-sign
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the Release
+        run: |
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"draft": false}' \
+            https://api.github.com/repos/${{ github.repository }}/releases/${{ needs.create-release.outputs.release_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
