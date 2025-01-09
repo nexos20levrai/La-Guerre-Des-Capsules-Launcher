@@ -47,7 +47,12 @@ jobs:
           python-version: 3.x
 
       - name: Install Dependencies
+        run: npm i  # Ajout de npm i avant npm ci
+        shell: bash
+
+      - name: Install Dependencies (clean install)
         run: npm ci
+        shell: bash
 
       - name: Build the Electron app
         run: npm run build
