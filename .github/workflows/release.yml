@@ -63,13 +63,13 @@ jobs:
           chmod +x cosign.exe
         shell: bash
 
-      - name: Sign executable with Cosign
+        - name: Sign executable with Cosign
         run: |
-          # Échappez les guillemets et les secrets de manière appropriée
-          $env:SIGSTORE_PRIVATE_KEY="${{ secrets.SIGSTORE_PRIVATE_KEY }}"
-          $env:COSIGN_PASSWORD="${{ secrets.COSIGN_PASSWORD }}"
-          .\cosign.exe sign --key $env:SIGSTORE_PRIVATE_KEY --password $env:COSIGN_PASSWORD `
+          echo ${{ secrets.SIGSTORE_PRIVATE_KEY }} > sigstore_private_key.pem
+          .\cosign.exe sign --key sigstore_private_key.pem \
           dist\La\ Guerre\ Des\ Capsules\ Launcher\ Setup\ ${{ env.version }}.exe
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}  # Vous pouvez essayer d'enlever cela si ce n'est pas nécessaire
         shell: powershell
 
   update-release:
