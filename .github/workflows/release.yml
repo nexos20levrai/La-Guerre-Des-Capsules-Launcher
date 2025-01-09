@@ -51,3 +51,11 @@ jobs:
           GH_TOKEN: ${{ secrets.github_token }}
         run: npm run build
         shell: bash
+        
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe.blockmap latest.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
