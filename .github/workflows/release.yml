@@ -19,9 +19,9 @@ jobs:
 
       - name: Create Release (Draft)
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v2  # Version mise à jour
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # Utilisation du PAT pour créer la release en mode draft
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Utilisation du GITHUB_TOKEN
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
