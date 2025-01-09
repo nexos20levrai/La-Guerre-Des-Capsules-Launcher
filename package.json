@@ -1,6 +1,6 @@
 {
   "name": "launcher-la-guerre-des-capsules",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "devDependencies": {
     "electron": "^33.3.1",
