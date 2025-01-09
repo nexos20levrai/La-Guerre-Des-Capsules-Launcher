@@ -19,7 +19,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.version }}
+          tag_name: ${{ env.version }}  # Assurez-vous que le tag est défini ici
           release_name: release ${{ env.version }}
           draft: true  # Crée la release en mode brouillon
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
@@ -59,6 +59,7 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ env.version }}  # Ajoutez ici le tag GitHub
           files: La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe.blockmap latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
