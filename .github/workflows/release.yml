@@ -19,9 +19,9 @@ jobs:
 
       - name: Create Release (Draft)
         id: create_release
-        uses: actions/create-release@v1  # Utilisation de la version v1
+        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Utilisation du GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # Utilisation de GH_TOKEN comme secret
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
@@ -47,12 +47,10 @@ jobs:
           python-version: 3.x
 
       - name: Install Dependencies
-        run: npm i  # Ajout de npm i avant npm ci
-        shell: bash
+        run: npm i
 
       - name: Install Dependencies (clean install)
         run: npm ci
-        shell: bash
 
       - name: Build the Electron app
         run: npm run build
