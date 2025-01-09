@@ -1,7 +1,9 @@
 name: Launcher Build
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]  # Exécute ce workflow lors des pushs sur la branche 'main'
+    tags:                # Exécute également lors du push de tags comme 'v*'
+      - 'v*'
 
 jobs:
   create-release:
@@ -13,13 +15,13 @@ jobs:
       - name: Get version
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
 
-      - name: Create Release
+      - name: Create Release (draft)
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.version }}  # Assurez-vous que le tag est défini ici
+          tag_name: ${{ env.version }}  # Utilise la version du fichier package.json pour définir le tag
           release_name: release ${{ env.version }}
           draft: true  # Crée la release en mode brouillon
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
@@ -27,10 +29,9 @@ jobs:
   build-launcher:
     needs: create-release
     runs-on: windows-latest
-
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -56,29 +57,25 @@ jobs:
         run: npm run build
         shell: bash
 
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.version }}  # Ajoutez ici le tag GitHub
-          files: La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe La-Guerre-Des-Capsules-Launcher-Setup-1.0.1.exe.blockmap latest.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   update-release:
     needs: build-launcher
     runs-on: ubuntu-latest
     steps:
-      - name: Update Release to Official
+      - name: Update Release to Published
         run: |
           # Récupérer l'ID de la release en mode draft (créée précédemment)
           release_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.version }}" \
             | jq .id)
 
-          # Mettre à jour la release pour la rendre officielle (pas draft)
-          curl -X PATCH \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d '{"draft": false}' \
-            "https://api.github.com/repos/${{ github.repository }}/releases/$release_id"
+          # Vérifier si l'ID existe, puis mettre à jour la release pour la rendre officielle (pas draft)
+          if [ "$release_id" != "null" ]; then
+            curl -X PATCH \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"draft": false}' \
+              "https://api.github.com/repos/${{ github.repository }}/releases/$release_id"
+          else
+            echo "Release ID not found, skipping update."
+          fi
         env:
           version: ${{ env.version }}
