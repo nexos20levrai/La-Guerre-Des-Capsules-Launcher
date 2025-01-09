@@ -1,5 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require("electron"); // Garder cette ligne
-const fetch = require("node-fetch");
+let fetch;
+
+async function loadFetch() {
+    fetch = (await import("node-fetch")).default;
+    // Call the functions that depend on fetch after it is loaded
+    await fetchUpdateNotes();
+    await fetchLastVersioUwU();
+}
+
+loadFetch();
 const fs = require("fs");
 const os = require("os");
 const https = require("https");
