@@ -1,39 +1,44 @@
-name: Launcher Build
+name: Build, Sign and Release with Cosign
+
 on:
   push:
-    branches: [ main ]  # Exécute ce workflow lors des pushs sur la branche 'main'
-    tags:                # Exécute également lors du push de tags comme 'v*'
+    branches:
+      - main
+    tags:
       - 'v*'
 
 jobs:
+  # Job to create a release in draft
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Get version
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
 
-      - name: Create Release (draft)
+      - name: Create Release (Draft)
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         with:
-          tag_name: ${{ env.version }}  # Utilise la version du fichier package.json pour définir le tag
+          tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
-          draft: true  # Crée la release en mode brouillon
+          draft: true
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
 
-  build-launcher:
+  # Job to build and sign the application
+  build-and-sign:
     needs: create-release
     runs-on: windows-latest
+
     steps:
-      - name: Check out Git repository
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22.x
@@ -43,45 +48,50 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Install Updates
-        run: npm i
-        shell: bash
-
       - name: Install Dependencies
         run: npm ci
-        shell: bash
 
-      - name: Build
-        env:
-          GH_TOKEN: ${{ secrets.github_token }}
+      - name: Build the Electron app
         run: npm run build
-        shell: bash
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@main
+
+      - name: Set up Cosign keys
+        run: |
+          echo "${{ secrets.SIGSTORE_PRIVATE_KEY }}" > cosign.key
+          echo "${{ secrets.SIGSTORE_PUBLIC_KEY }}" > cosign.pub
+
+      - name: Sign the .exe with Cosign
+        run: |
+          cosign sign --key cosign.key ./path-to-your-build-file.exe
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+  # Job to update the release and publish it
   update-release:
-    needs: build-launcher
+    needs: build-and-sign
     runs-on: ubuntu-latest
     steps:
-      - name: Verify if Release exists
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get version
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Get the release ID
+        id: get_release_id
         run: |
-          # Récupérer la release en utilisant l'API GitHub
-          response=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.version }}")
+          release_id=$(curl -s \
+            -H "Authorization: token ${{ secrets.GH_PAT }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.version }} | \
+            jq -r .id)
+          echo "release_id=$release_id" >> $GITHUB_ENV
 
-          echo "API Response: $response"
-
-          # Extraire l'ID de la release
-          release_id=$(echo "$response" | jq .id)
-
-          # Vérifier si l'ID existe
-          if [ "$release_id" != "null" ]; then
-            echo "Release ID found: $release_id"
-            # Mettre à jour la release pour la rendre officielle
-            curl -X PATCH \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d '{"draft": false}' \
-              "https://api.github.com/repos/${{ github.repository }}/releases/$release_id"
-          else
-            echo "Release ID not found, skipping update."
-          fi
-        env:
-          version: ${{ env.version }}
+      - name: Publish Release
+        if: ${{ steps.get_release_id.outputs.release_id != '' }}
+        run: |
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GH_PAT }}" \
+            -d '{"draft": false, "prerelease": false}' \
+            https://api.github.com/repos/${{ github.repository }}/releases/${{ env.release_id }}
