@@ -18,7 +18,12 @@
     "start": "electron .",
     "build": "electron-builder"
   },
-  "keywords": ["electron", "launcher", "game", "la-guerre-des-capsules"],
+  "keywords": [
+    "electron",
+    "launcher",
+    "game",
+    "la-guerre-des-capsules"
+  ],
   "author": "NeXoS_20",
   "license": "ISC",
   "description": "Launcher du jeu La Guerre Des Capsules",
