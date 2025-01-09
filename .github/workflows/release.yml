@@ -8,7 +8,6 @@ on:
       - 'v*'
 
 jobs:
-  # Job to create a release in draft
   create-release:
     runs-on: ubuntu-latest
     steps:
@@ -22,14 +21,13 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # Utilisation du PAT au lieu de GITHUB_TOKEN
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
           draft: true
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
 
-  # Job to build and sign the application
   build-and-sign:
     needs: create-release
     runs-on: windows-latest
@@ -68,7 +66,6 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
 
-  # Job to update the release and publish it
   update-release:
     needs: build-and-sign
     runs-on: ubuntu-latest
