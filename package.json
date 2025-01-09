@@ -7,7 +7,7 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "La Guerre Des Capsules Launcher",
+    "appId": "com.nexos20.guerredescapsules.launcher",
     "productName": "La Guerre Des Capsules Launcher",
     "win": {
       "target": "nsis",
@@ -18,12 +18,12 @@
     "start": "electron .",
     "build": "electron-builder"
   },
-  "keywords": [],
+  "keywords": ["electron", "launcher", "game", "la-guerre-des-capsules"],
   "author": "NeXoS_20",
   "license": "ISC",
   "description": "Launcher du jeu La Guerre Des Capsules",
   "dependencies": {
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.3.2",
     "os": "^0.1.2",
     "unzipper": "^0.12.3"
   }

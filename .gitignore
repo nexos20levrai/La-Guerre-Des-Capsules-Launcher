@@ -31,6 +31,3 @@ build/
 # Ignorer les fichiers de l'OS
 .DS_Store
 Thumbs.db
-
-# Ignorer les fichiers spécifiques
-*.iit
