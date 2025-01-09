@@ -21,7 +21,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # Utilisation du PAT au lieu de GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # Utilisation du PAT pour créer la release en mode draft
         with:
           tag_name: ${{ env.version }}
           release_name: release ${{ env.version }}
@@ -65,30 +65,3 @@ jobs:
           cosign sign --key cosign.key ./path-to-your-build-file.exe
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
-  update-release:
-    needs: build-and-sign
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Get version
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
-
-      - name: Get the release ID
-        id: get_release_id
-        run: |
-          release_id=$(curl -s \
-            -H "Authorization: token ${{ secrets.GH_PAT }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.version }} | \
-            jq -r .id)
-          echo "release_id=$release_id" >> $GITHUB_ENV
-
-      - name: Publish Release
-        if: ${{ steps.get_release_id.outputs.release_id != '' }}
-        run: |
-          curl -X PATCH \
-            -H "Authorization: token ${{ secrets.GH_PAT }}" \
-            -d '{"draft": false, "prerelease": false}' \
-            https://api.github.com/repos/${{ github.repository }}/releases/${{ env.release_id }}
