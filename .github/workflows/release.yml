@@ -63,7 +63,7 @@ jobs:
           chmod +x cosign.exe
         shell: bash
 
-        - name: Sign executable with Cosign
+      - name: Sign executable with Cosign
         run: |
           echo ${{ secrets.SIGSTORE_PRIVATE_KEY }} > sigstore_private_key.pem
           .\cosign.exe sign --key sigstore_private_key.pem \
