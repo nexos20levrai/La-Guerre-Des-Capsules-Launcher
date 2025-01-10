@@ -7,7 +7,7 @@ document.getElementById("check-updates").addEventListener("click", async () => {
     const button = document.getElementById("check-updates");
 
     button.disabled = true;
-    statusDiv.innerText = "Téléchargement...";
+    statusDiv.innerText = "Jouer !";
 
     const result = await ipcRenderer.invoke("checkForUpdates");
 
@@ -15,13 +15,13 @@ document.getElementById("check-updates").addEventListener("click", async () => {
         statusDiv.innerText = "Installation...";
 
         setTimeout(() => { 
-            button.disabled = false; // Re-enable the button after installation
+            button.disabled = false;
             statusDiv.innerText = "Installation terminée.";
-            button.innerText = "Jouer !"; // Reset button text to "Jouer !"
-            ipcRenderer.invoke("launchGame"); // Launch the game
+            button.innerText = "Jouer !";
+            ipcRenderer.invoke("launchGame");
         }, 5000);
     } else if (result.status === "up-to-date") {
-        statusDiv.innerText = "Jeu à jour.";
+        statusDiv.innerText = "Jeu à jour";
         button.disabled = false;
         ipcRenderer.invoke("launchGame");
     } else {
@@ -30,15 +30,14 @@ document.getElementById("check-updates").addEventListener("click", async () => {
     }
 });
 
-ipcRenderer.on('download-progress', (event, progress) => {
+ipcRenderer.on("download-progress", (event) => {
     const statusDiv = document.getElementById("status");
-    statusDiv.innerText = `Téléchargement... ${progress}%`; // Update status text with progress
+    statusDiv.innerText = `Téléchargement...`;
 });
 
-// New code to display update notes
-ipcRenderer.on('update-notes', (event, notes) => {
+ipcRenderer.on("update-notes", (event, notes) => {
     const updateNotesDiv = document.getElementById("update-notes");
-    updateNotesDiv.innerText = notes; // Display the fetched notes
+    updateNotesDiv.innerText = notes;
 });
 
 document.getElementById("check-updates").addEventListener("dblclick", async () => {
@@ -47,8 +46,6 @@ document.getElementById("check-updates").addEventListener("dblclick", async () =
 
 const versionElement = document.getElementById("version");
 
-// Écouter les données envoyées par le processus principal
 ipcRenderer.on("version", (event, notes) => {
-    console.log("Version received:", notes); // Log pour vérification
-    versionElement.textContent = notes; // Mettre à jour l'élément HTML
+    versionElement.textContent = notes;
 });

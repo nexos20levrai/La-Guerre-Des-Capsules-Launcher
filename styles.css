@@ -1,9 +1,9 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Orbitron', sans-serif; /* Police futuriste */
+    font-family: 'Orbitron', sans-serif;
     overflow: hidden;
-    background-color: #0d1117; /* Fond sombre avec une touche de bleu */
+    background-color: #0d1117;
 }
 
 .launcher-container {
@@ -12,27 +12,27 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle, #1f2937, #0d1117); /* Dégradé futuriste */
+    background: radial-gradient(circle, #1f2937, #0d1117);
 }
 
 .background-image {
     width: 100%;
     height: 100%;
     background: radial-gradient(circle, #1f2937, #0d1117);
-    background-size: 120%; /* Agrandir l'image à 120% */
+    background-size: 120%;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-position: center; /* S'assurer que l'image est centrée */
+    background-position: center;
 }
 
 .game-logo {
     position: absolute;
-    top: 20px; /* Ajuster la position selon vos besoins */
+    top: 20px;
     left: 50%;
-    transform: translateX(-50%); /* Centrer horizontalement */
-    max-width: 150px; /* Ajuster la taille du logo */
+    transform: translateX(-50%);
+    max-width: 150px;
 }
 
 .status-overlay {
@@ -48,10 +48,9 @@ body {
     background-color: #72d122;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background-color 0.3s;
-    border-radius: 12px;
 }
 
 .action-button:hover {
@@ -65,26 +64,25 @@ body {
     text-shadow: 1px 1px 2px black;
 }
 
-/* Styles for the update notes */
 .update-notes {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%; /* Adjust width as needed */
-    max-width: 600px; /* Maximum width */
-    background-color: rgba(0, 0, 0, 0.5); /* Transparent gray */
-    border-radius: 15px; /* Rounded corners */
-    padding: 20px; /* Padding inside the rectangle */
-    color: rgb(255, 255, 255); /* Text color */
-    text-align: center; /* Center text */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+    width: 80%;
+    max-width: 600px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    padding: 20px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .version {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    color: white; /* ou une autre couleur selon le design */
-    font-size: 14px; /* ajustez la taille de la police si nécessaire */
+    color: white;
+    font-size: 14px;
 }
