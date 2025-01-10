@@ -1,14 +1,4 @@
 const { app, BrowserWindow, ipcMain } = require("electron"); // Garder cette ligne
-let fetch;
-
-async function loadFetch() {
-    fetch = (await import("node-fetch")).default;
-    // Call the functions that depend on fetch after it is loaded
-    await fetchUpdateNotes();
-    await fetchLastVersioUwU();
-}
-
-loadFetch();
 const fs = require("fs");
 const os = require("os");
 const https = require("https");
@@ -19,9 +9,9 @@ const { exec } = require("child_process");
 let mainWindow;
 
 // URL pour vérifier la version
-const pastebinUrl = "https://pastebin.com/raw/iYW9NG1b"; // Version actuelle
-const gameZipUrl = "https://www.googleapis.com/drive/v3/files/1D-4ZcAjnmcWxI0L7mFRvgGx7Zf00sXGb?alt=media&key=AIzaSyCGE3KiwHENNSbet1JwbTwjHIXVMYAbYPE";
-const updateNotesUrl = "https://pastebin.com/raw/1CG8M28L"; // Replace with your actual Pastebin ID
+const pastebinUrl = "https://raw.githubusercontent.com/nexos20levrai/La-Guerre-Des-Capsules-DL/refs/heads/main/version.txt"; // Version actuelle
+const gameZipUrl = "https://raw.githubusercontent.com/nexos20levrai/La-Guerre-Des-Capsules-DL/refs/heads/main/Win/Build.zip";
+const updateNotesUrl = "https://raw.githubusercontent.com/nexos20levrai/La-Guerre-Des-Capsules-DL/refs/heads/main/update_notes.txt"; // Replace with your actual Pastebin ID
 
 // Dossier où sera installé le jeu
 const gameFolder = path.join(process.env.APPDATA, ".La Guerre Des Capsules");
@@ -48,6 +38,7 @@ app.on("ready", () => {
 
 async function fetchUpdateNotes() {
     try {
+        const fetch = (await import("node-fetch")).default; // Import dynamique
         const response = await fetch(updateNotesUrl);
         console.log("Response status:", response.status); // Log the response status
         if (!response.ok) {
@@ -63,6 +54,7 @@ async function fetchUpdateNotes() {
 
 async function fetchLastVersioUwU() {
     try {
+        const fetch = (await import("node-fetch")).default; // Import dynamique
         // Vérifie si le dossier du jeu existe sinon le crée
         if (!fs.existsSync(gameFolder)) {
             fs.mkdirSync(gameFolder, { recursive: true });
@@ -87,11 +79,10 @@ async function fetchLastVersioUwU() {
     }
 }
 
-
-
 // Vérifie et télécharge les mises à jour
 ipcMain.handle("checkForUpdates", async (event) => {
     try {
+        const fetch = (await import("node-fetch")).default; // Import dynamique
         const response = await fetch(pastebinUrl);
         const latestVersion = (await response.text()).trim();
         const localVersionPath = path.join(gameFolder, "version.txt");
@@ -166,6 +157,6 @@ ipcMain.handle("launchGame", () => {
         }
         console.log("Game launched successfully!");
         console.log(`stdout: ${stdout}`);
+        app.quit();
     });
-    app.quit();
 });
